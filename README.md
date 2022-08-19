@@ -1,13 +1,21 @@
-# Sample Hardhat Project
+# smartcontracts
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+----
+Audits
+<TBD>
 
-Try running some of the following tasks:
+----
+Router Contract
+- Implemented for primary market buy/sell between Issuers and Investors
 
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
+Token Contract
+- Frigg deploys a new ERC20 token for each new issuance
+
+----
+Contract Addresses
+- Router: <tbd>
+- Token: <tbd>
+
+----
+Governance
+- How is changes to Router / Token contract (e.g., when bond matures) governed (does changes to GitHub repo automatically adjust smart contract? Does it need to be signed by 2 parties / wallets? etc..)

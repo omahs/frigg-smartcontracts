@@ -22,13 +22,15 @@ Once the bond reach the end of the Term, the issuer will repurchase each Token B
 
 * Max supply: ... 
 * Init Supply: ...
-* Decimals: 
+* Decimals: 18
 * Token Name: ATT
 * Security type: Zero Coupon Bond
 * Nominal Value: 2.0 million USD
 * Tenure: 15 years
 * Face Value: 3'644'238
 * Implied Interest: 4.0 %
+* Issuance Price: $100 USDC
+* Expiry Price: $182 USDC
 
 ## Installation and Running Tests
 
