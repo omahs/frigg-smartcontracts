@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { loadFixture } from 'ethereum-waffle';
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 
 describe("ATT", function () {
   async function getContracts() {
@@ -30,7 +30,7 @@ describe("ATT", function () {
     it("Should revert because caller is not the admin", async function () {
       const { att, owner } = await loadFixture(getContracts);
 
-      expect(await att.setBondExpiry()).to.be.revertedWith(`AccessControl: account 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266 is missing role 0x0000000000000000000000000000000000000000000000000000000000000000`);
+      await expect(att.setBondExpiry()).to.be.reverted;
     });
 
     it("Should set bond expiry to true", async function () {
