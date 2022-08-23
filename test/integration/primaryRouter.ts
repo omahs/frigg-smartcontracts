@@ -1,9 +1,11 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import chai, { expect } from "chai";
 import { ethers } from "hardhat";
-import { expect } from "chai";
-import UID_ABI from "./artifacts/UIDToken.json";
 import USDC_ABI from "./artifacts/USDC.json";
-import { formatUnits, parseUnits } from 'ethers/lib/utils';
+import chaiString from 'chai-string';
+import { smock } from "@defi-wonderland/smock";
+
+chai.use(chaiString);
 
 describe("primaryRouter", function () {
   async function getContracts() {
@@ -30,19 +32,26 @@ describe("primaryRouter", function () {
       issuanceTokenAddress: USDC_ADDRESS,
     }
 
-    return { att, primaryRouter, owner, addr1, USDC_ADDRESS, GOLDFINCH_UID, tokenData };
+    const myContractFake = await smock.fake(att);
+
+    return { att, primaryRouter, owner, addr1, USDC_ADDRESS, GOLDFINCH_UID, tokenData, myContractFake };
   }
 
-  it("Add new Token to router contract", async function () {
-    const { att, primaryRouter, owner, addr1, USDC_ADDRESS, GOLDFINCH_UID, tokenData } = await loadFixture(getContracts);
-    
+  it("Should add new Token to router contract", async function () {
+    const { att, primaryRouter, owner, addr1, tokenData } = await loadFixture(getContracts);
+
     await expect(primaryRouter.connect(addr1).add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)).to.be.reverted;
 
     await primaryRouter.connect(owner).add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)
-    console.log(await primaryRouter.tokenData(att.address));
-    
+    const data = await primaryRouter.tokenData(att.address);
+
+    expect(tokenData.issuer).to.equalIgnoreCase(data['issuer']);
+    expect(tokenData.uIdContract).to.equalIgnoreCase(data['uIdContract']);
+    expect(tokenData.issuancePrice).to.equal(ethers.BigNumber.from(data['issuancePrice']).toNumber());
+    expect(tokenData.expiryPrice).to.equal(ethers.BigNumber.from(data['expiryPrice']).toNumber());
+    expect(tokenData.issuanceTokenAddress).to.equalIgnoreCase(data['issuanceTokenAddress']);
   });
-  
+
   describe("Buy Token", function () {
     it("Should revert because inputToken needs to be > 0", async function () {
       const { att, primaryRouter } = await loadFixture(getContracts);
@@ -54,29 +63,60 @@ describe("primaryRouter", function () {
       await expect(primaryRouter.buy(att.address, 10)).to.be.reverted;
     });
 
-    it("Mint UID Token", async function () {
-      const { att, owner, primaryRouter, tokenData, USDC_ADDRESS, GOLDFINCH_UID } = await loadFixture(getContracts);
+    it("Should revert because primary Market is not active", async function () {
+      const { att, primaryRouter, myContractFake } = await loadFixture(getContracts);
+      myContractFake.isPrimaryMarketActive.returns(false)
+      await expect(primaryRouter.buy(myContractFake.address, 10)).to.be.reverted;
+    });
 
-      const uidContract = new ethers.Contract(GOLDFINCH_UID, UID_ABI);
-      const signer = await owner.signMessage("Test UID Token");
+    it("Transfer Token to buyer", async function () {
+      const { att, owner, primaryRouter, tokenData, USDC_ADDRESS } = await loadFixture(getContracts);
 
       const uid = await ethers.getImpersonatedSigner("0x335aE5dd1b3de7e80148B72Df0511167E2498187");
 
-      await owner.sendTransaction({
-        to: uid.address,
-        value: ethers.utils.parseEther("1") // 1 ether
-      })
-
-      console.log(uid);
-      
-
       await primaryRouter.add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)
-      
+
       const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI);
 
-      await usdcContract.approve(uid.address, 10);
+      await usdcContract.connect(owner).approve(primaryRouter.address, 10000000);
 
-      await primaryRouter.connect(uid).buy(att.address, 10);
+      await primaryRouter.connect(uid).buy(att.address, 1);
+
+      await expect(primaryRouter.connect(uid).buy(att.address, 1))
+        .to.emit(primaryRouter, "SuccessfulPurchase")
+        .withArgs(owner.address, tokenData.outputTokenAddress, tokenData.issuanceTokenAddress);
+    });
+  });
+
+  describe("Sell Token", function () {
+    it("Should revert because inputToken needs to be > 0", async function () {
+      const { att, primaryRouter } = await loadFixture(getContracts);
+      await expect(primaryRouter.sell(att.address, 0)).to.be.revertedWith("You cannot sell 0 token");
+    });
+
+    it("Should revert because account has no UID Token", async function () {
+      const { att, primaryRouter } = await loadFixture(getContracts);
+      await expect(primaryRouter.sell(att.address, 10)).to.be.reverted;
+    });
+
+    it("Should revert because expiry date is not active", async function () {
+      const { att, primaryRouter, myContractFake } = await loadFixture(getContracts);
+      await expect(primaryRouter.sell(att.address, 10)).to.be.reverted;
+    });
+
+    it("Transfer Token to issuer", async function () {
+      const { att, owner, primaryRouter, tokenData, myContractFake } = await loadFixture(getContracts);
+      const uid = await ethers.getImpersonatedSigner("0x335aE5dd1b3de7e80148B72Df0511167E2498187");
+
+      await primaryRouter.add(att.address, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)
+
+      myContractFake.seeBondExpiryStatus.returns(true);
+
+      await primaryRouter.connect(uid).sell(myContractFake.address, 1);
+
+      await expect(primaryRouter.connect(uid).sell(myContractFake.address, 1))
+        .to.emit(primaryRouter, "SuccessfulExpiration")
+        .withArgs(owner.address, tokenData.outputTokenAddress, tokenData.issuanceTokenAddress);
     });
   });
 });

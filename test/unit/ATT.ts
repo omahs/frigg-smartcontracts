@@ -1,6 +1,9 @@
-import { expect } from "chai";
-import { ethers } from "hardhat";
+import { smock } from '@defi-wonderland/smock';
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import chai, { expect } from "chai";
+import { ethers } from "hardhat";
+
+chai.use(smock.matchers);
 
 describe("ATT", function () {
   async function getContracts() {
@@ -14,12 +17,29 @@ describe("ATT", function () {
     console.log("deployed router: ", primaryRouter.address);
 
     const att = await ATT.deploy(MULTISIG, primaryRouter.address);
-    return { att, primaryRouter, owner, addr1 };
+    const myContractFake =  await smock.fake(att);
+    return { att, primaryRouter, owner, addr1, myContractFake };
   }
 
-    it("Check if primary market is active", async function () {
-      const { att } = await loadFixture(getContracts);
-      expect(await att.isPrimaryMarketActive()).to.equal(true);
+    describe("Check primary market", function () {
+      it("Check if primary market is active", async function () {
+        const { att } = await getContracts();
+        expect(await att.isPrimaryMarketActive()).to.equal(true);
+      });
+
+      it("Should return false when totalSupply = cap", async function () {
+        const { myContractFake } = await getContracts();
+        myContractFake.totalSupply.returns(10)
+        myContractFake.cap.returns(10)
+        expect(await myContractFake.isPrimaryMarketActive()).to.equal(false);
+      });
+
+      it("Should return false when totalSupply > cap", async function () {
+        const { myContractFake } = await getContracts();
+        myContractFake.totalSupply.returns(10)
+        myContractFake.cap.returns(5)
+        expect(await myContractFake.isPrimaryMarketActive()).to.equal(false);
+      });
     });
 
     it("Check if bond has expired", async function () {
@@ -28,14 +48,12 @@ describe("ATT", function () {
     });
 
     it("Should revert because caller is not the admin", async function () {
-      const { att, owner } = await loadFixture(getContracts);
-
+      const { att } = await loadFixture(getContracts);
       await expect(att.setBondExpiry()).to.be.reverted;
     });
 
     it("Should set bond expiry to true", async function () {
       const { att, addr1 } = await loadFixture(getContracts);
-
       expect(await att.connect(addr1).setBondExpiry());
       expect(await att.seeBondExpiryStatus()).to.equal(true)
     });
