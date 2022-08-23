@@ -58,7 +58,7 @@ contract ATT is ERC20Capped, AccessControl, IFrigg {
 
     //Terms will contain the terms of issue for this particular token
     //To be updated before mainnet deployment
-    string public override termsURL = "https://www.frigg.eco/";
+    string public override termsURL = "https://www.agatobwe.eco/terms-of-issue";
 }
 
    
