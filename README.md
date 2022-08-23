@@ -1,29 +1,28 @@
-# smartcontracts
+# frigg-smartcontracts
 
-----
-Audits
+### Audits
 <TBD>
 
 ----
-Router Contract
+### Router Contract
 - Implemented for primary market buy/sell between Issuers and Investors
 
-Token Contract
+### Token Contract
 - Frigg deploys a new ERC20 token for each new issuance
 
 ----
-Contract Addresses
+### Contract Addresses
 - Router: <tbd>
 - Token: <tbd>
 
 ----
-Governance
+### Governance
 - How is changes to Router / Token contract (e.g., when bond matures) governed (does changes to GitHub repo automatically adjust smart contract? Does it need to be signed by 2 parties / wallets? etc..)
 - Chnanges to Router redeployed
 - _grantrole at token contracts 
 
 ---
-Tests
+### Tests
 
 run hardhat tests with command ```npx hardhat test```
 
@@ -58,3 +57,20 @@ Integration Tests
 4. transferFrom function, which you need to impersonate an address to ensure approval
 5. mint() check the right amount of token is minted OR .burn ()
 6. right event is emitted
+
+run solidity coverage with command ```npx hardhat coverage```
+
+Output: 
+
+File                |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
+--------------------|----------|----------|----------|----------|----------------|
+ Router/            |      100 |    92.86 |      100 |      100 |                |
+  primaryRouter.sol |      100 |    92.86 |      100 |      100 |                |
+ Token/             |      100 |      100 |      100 |      100 |                |
+  IFrigg.sol        |      100 |      100 |      100 |      100 |                |
+ Token/ATT/         |      100 |      100 |      100 |      100 |                |
+  ATT.sol           |      100 |      100 |      100 |      100 |                |
+ Token/BTT/         |      100 |      100 |      100 |      100 |                |
+  BTT.sol           |      100 |      100 |      100 |      100 |                |
+|
+All files           |      100 |    92.86 |      100 |      100 
