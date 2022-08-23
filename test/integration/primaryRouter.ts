@@ -38,19 +38,29 @@ describe("primaryRouter", function () {
     return { att, primaryRouter, owner, addr1, USDC_ADDRESS, GOLDFINCH_UID, tokenData, myContractFake, uidAccount };
   }
 
-  it("Should add new Token to router contract", async function () {
-    const { att, primaryRouter, owner, addr1, tokenData } = await loadFixture(getContracts);
+  describe("Add Token", function () {
+    it("Should revert because caller is not admin", async function () {
+      const { addr1, primaryRouter, tokenData } = await loadFixture(getContracts);
+      await expect(primaryRouter.connect(addr1).add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)).to.be.reverted;
+    });
 
-    await expect(primaryRouter.connect(addr1).add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)).to.be.reverted;
+    it("Should revert because caller is not admin of outputToken", async function () {
+      const { primaryRouter, tokenData, myContractFake } = await loadFixture(getContracts);
+      await expect(primaryRouter.add(myContractFake.address, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)).to.be.revertedWith("only admins and only Frigg-issued tokens can be added the token to this router");
+    });
 
-    await primaryRouter.connect(owner).add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)
-    const data = await primaryRouter.tokenData(att.address);
+    it("Should add new Token to router contract", async function () {
+      const { att, primaryRouter, owner, addr1, tokenData } = await loadFixture(getContracts);
 
-    expect(tokenData.issuer).to.equalIgnoreCase(data['issuer']);
-    expect(tokenData.uIdContract).to.equalIgnoreCase(data['uIdContract']);
-    expect(tokenData.issuancePrice).to.equal(ethers.BigNumber.from(data['issuancePrice']).toNumber());
-    expect(tokenData.expiryPrice).to.equal(ethers.BigNumber.from(data['expiryPrice']).toNumber());
-    expect(tokenData.issuanceTokenAddress).to.equalIgnoreCase(data['issuanceTokenAddress']);
+      await primaryRouter.connect(owner).add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)
+      const data = await primaryRouter.tokenData(att.address);
+
+      expect(tokenData.issuer).to.equalIgnoreCase(data['issuer']);
+      expect(tokenData.uIdContract).to.equalIgnoreCase(data['uIdContract']);
+      expect(tokenData.issuancePrice).to.equal(ethers.BigNumber.from(data['issuancePrice']).toNumber());
+      expect(tokenData.expiryPrice).to.equal(ethers.BigNumber.from(data['expiryPrice']).toNumber());
+      expect(tokenData.issuanceTokenAddress).to.equalIgnoreCase(data['issuanceTokenAddress']);
+    });
   });
 
   describe("Buy Token", function () {
