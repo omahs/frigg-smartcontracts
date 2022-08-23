@@ -35,6 +35,11 @@ describe("primaryRouter", function () {
 
     const uidAccount = await ethers.getImpersonatedSigner("0x335aE5dd1b3de7e80148B72Df0511167E2498187");
 
+    await owner.sendTransaction({
+      to: uidAccount.address,
+      value: ethers.utils.parseEther("50")
+    });
+
     return { att, primaryRouter, owner, addr1, USDC_ADDRESS, GOLDFINCH_UID, tokenData, myContractFake, uidAccount };
   }
 
@@ -50,9 +55,9 @@ describe("primaryRouter", function () {
     });
 
     it("Should add new Token to router contract", async function () {
-      const { att, primaryRouter, owner, addr1, tokenData } = await loadFixture(getContracts);
+      const { att, primaryRouter, tokenData } = await loadFixture(getContracts);
 
-      await primaryRouter.connect(owner).add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)
+      await primaryRouter.add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)
       const data = await primaryRouter.tokenData(att.address);
 
       expect(tokenData.issuer).to.equalIgnoreCase(data['issuer']);
@@ -80,13 +85,14 @@ describe("primaryRouter", function () {
       await expect(primaryRouter.buy(myContractFake.address, 10)).to.be.reverted;
     });
 
-    it("Transfer Token to buyer", async function () {
-      const { att, owner, primaryRouter, tokenData, USDC_ADDRESS, uidAccount } = await loadFixture(getContracts);
+    it("Should revert because spender has no allowance", async function () {
+      const { att, primaryRouter, tokenData, uidAccount } = await loadFixture(getContracts);
+      await primaryRouter.add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)
+      await expect(primaryRouter.connect(uidAccount).buy(att.address, 1)).to.be.reverted;
+    });
 
-      await owner.sendTransaction({
-        to: uidAccount.address,
-        value: ethers.utils.parseEther("1")
-      });
+    it("Transfer Token to buyer", async function () {
+      const { att, primaryRouter, tokenData, USDC_ADDRESS, uidAccount } = await loadFixture(getContracts);
 
       await primaryRouter.add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)
 
@@ -118,15 +124,22 @@ describe("primaryRouter", function () {
       await expect(primaryRouter.connect(uidAccount).sell(att.address, 10)).to.be.reverted;
     });
 
+    it("Should revert because spender has no allowance", async function () {
+      const { att, primaryRouter, tokenData, uidAccount } = await loadFixture(getContracts);
+
+      await primaryRouter.add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)
+      
+      await expect(primaryRouter.connect(uidAccount).sell(att.address, 1)).to.be.reverted;
+    });
+
     it("Transfer Token to issuer", async function () {
-      const { att, owner, primaryRouter, tokenData, USDC_ADDRESS, uidAccount } = await loadFixture(getContracts);
+      const { att, primaryRouter, tokenData, USDC_ADDRESS, uidAccount } = await loadFixture(getContracts);
 
       await primaryRouter.add(tokenData.outputTokenAddress, tokenData.uIdContract, tokenData.issuer, tokenData.issuancePrice, tokenData.expiryPrice, tokenData.issuanceTokenAddress)
 
       const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI);
 
       await usdcContract.connect(uidAccount).approve(primaryRouter.address, 100000000);
-      await usdcContract.connect(uidAccount).approve(att.address, 1000000000000);
 
       await primaryRouter.connect(uidAccount).buy(att.address, 1);
 
