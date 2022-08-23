@@ -1,11 +1,17 @@
 {
   "name": "hardhat-project",
   "devDependencies": {
+    "@defi-wonderland/smock": "^2.2.0",
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
+    "@nomiclabs/hardhat-ethers": "^2.1.1",
+    "chai": "^4.3.6",
+    "chai-string": "^1.5.0",
     "dotenv": "^16.0.1",
     "hardhat": "^2.10.2"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.3"
+    "@openzeppelin/contracts": "^4.7.3",
+    "@types/chai-string": "^1.4.2"
   }
 }
