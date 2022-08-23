@@ -26,7 +26,7 @@
 
 run hardhat tests with command ```npx hardhat test```
 
-##Unit Test
+## Unit Test
 - isPrimaryMarketActive() on line 34 of ATT.sol
 
 1. when totalSupply() < cap ()
@@ -65,7 +65,7 @@ run hardhat tests with command ```npx hardhat test```
 5. mint() check the right amount of token is minted OR .burn ()
 6. right event is emitted
 
-##Test coverage
+## Test coverage
 
 run solidity coverage with command ```npx hardhat coverage```
 
