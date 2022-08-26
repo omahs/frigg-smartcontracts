@@ -44,18 +44,6 @@ contract primaryRouter is AccessControl {
         _grantRole(DEFAULT_ADMIN_ROLE, _multisig);
     }
 
-    modifier onlyUidOwner(address friggTokenAddress) {
-        /// check for user balance of UID
-        require(
-            IERC1155(tokenData[friggTokenAddress].uIdContract).balanceOf(
-                msg.sender,
-                0
-            ) > 0,
-            "Need a UID token"
-        );
-        _;
-    }
-
     ///  @dev Only allows DEFAULT_ADMIN_ROLE to add Frigg-issued tokens to this router
     ///  @param _outputTokenAddress Frigg-issued token address
     ///  @param _uIdContract Whitelister contract address
@@ -94,11 +82,17 @@ contract primaryRouter is AccessControl {
     /// @dev initially users can only buy Frigg-issued asset backed tokens with USDC
     /// i.e. inputToken is USDC and outputToken is the ABT
     /// @dev inputTokenAmount should be in the same number of decimals as issuanceTokenAddress implemented
-    function buy(address friggTokenAddress, uint256 inputTokenAmount)
-        external
-        onlyUidOwner(friggTokenAddress)
-    {
+    function buy(address friggTokenAddress, uint256 inputTokenAmount) external {
         require(inputTokenAmount > 0, "You cannot buy with 0 token");
+
+        /// check for user balance of UID
+        require(
+            IERC1155(tokenData[friggTokenAddress].uIdContract).balanceOf(
+                msg.sender,
+                0
+            ) > 0,
+            "Need a UID token"
+        );
 
         IERC20 inputToken = IERC20(
             tokenData[friggTokenAddress].issuanceTokenAddress
@@ -136,9 +130,17 @@ contract primaryRouter is AccessControl {
     /// @dev inputFriggTokenAmount should be in 18 decimals
     function sell(address friggTokenAddress, uint256 inputFriggTokenAmount)
         external
-        onlyUidOwner(friggTokenAddress)
     {
         require(inputFriggTokenAmount > 0, "You cannot sell 0 token");
+
+        /// check for user balance of UID
+        require(
+            IERC1155(tokenData[friggTokenAddress].uIdContract).balanceOf(
+                msg.sender,
+                0
+            ) > 0,
+            "Need a UID token"
+        );
 
         IFrigg inputToken = IFrigg(friggTokenAddress);
         IERC20 outputToken = IERC20(
