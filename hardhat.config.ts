@@ -1,7 +1,8 @@
 import "@nomicfoundation/hardhat-toolbox";
+import "@nomiclabs/hardhat-etherscan";
 import dotenv from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
-import "solidity-coverage"
+import "solidity-coverage";
 
 dotenv.config();
 
@@ -25,8 +26,15 @@ const config: HardhatUserConfig = {
       forking: {
         url: `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`
       },
+    },
+    goerli: {
+      url: `https://goerli.infura.io/v3/${process.env.INFURA_KEY}`,
+      accounts: [process.env.PRIVATE_KEY!],
     }
   },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY!
+  }
 };
 
 export default config;

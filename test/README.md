@@ -1,9 +1,11 @@
 ---
+
 ### Tests
 
-run hardhat tests with command ```npx hardhat test```
+run hardhat tests with command `npx hardhat test`
 
 ## Unit Test
+
 - isPrimaryMarketActive() on line 34 of ATT.sol
 
 1. when totalSupply() < cap ()
@@ -44,19 +46,17 @@ run hardhat tests with command ```npx hardhat test```
 
 ## Test coverage
 
-run solidity coverage with command ```npx hardhat coverage```
+run solidity coverage with command `npx hardhat coverage`
 
-Output: 
+Output:
 
-File                |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
---------------------|----------|----------|----------|----------|----------------|
- Router/            |      100 |    92.86 |      100 |      100 |                |
-  primaryRouter.sol |      100 |    92.86 |      100 |      100 |                |
- Token/             |      100 |      100 |      100 |      100 |                |
-  IFrigg.sol        |      100 |      100 |      100 |      100 |                |
- Token/ATT/         |      100 |      100 |      100 |      100 |                |
-  ATT.sol           |      100 |      100 |      100 |      100 |                |
- Token/BTT/         |      100 |      100 |      100 |      100 |                |
-  BTT.sol           |      100 |      100 |      100 |      100 |                |
-|
-All files           |      100 |    92.86 |      100 |      100 
+| File              | % Stmts | % Branch | % Funcs | % Lines | Uncovered Lines |
+| ----------------- | ------- | -------- | ------- | ------- | --------------- |
+| Router/           | 100     | 92.86    | 100     | 100     |                 |
+| primaryRouter.sol | 100     | 92.86    | 100     | 100     |                 |
+| Token/            | 100     | 100      | 100     | 100     |                 |
+| IFrigg.sol        | 100     | 100      | 100     | 100     |                 |
+| Token/ATT/        | 100     | 100      | 100     | 100     |                 |
+| ATT.sol           | 100     | 100      | 100     | 100     |                 |
+| Token/BTT/        | 100     | 100      | 100     | 100     |                 |
+| BTT.sol           | 100     | 100      | 100     | 100     |                 |

@@ -3,22 +3,21 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import '../IFrigg.sol';
+import "../IFrigg.sol";
 
 /// @title A token contract and a standard for Frigg Asset-backed Tokens (ABT)
 /// @author Frigg team
 /// @dev inherits the OpenZepplin ERC20Capped, AccessControl and Frigg token standard implementations
 contract ATT is ERC20Capped, AccessControl, IFrigg {
-
     /// @dev ROUTER_ROLE has permission to mint and burn tokens
     bytes32 public constant ROUTER_ROLE = keccak256("ROUTER_ROLE");
 
     using SafeERC20 for ERC20;
 
-    //cap the supply of token to 20,000    
-    constructor(address _multisig, address _router) 
-    ERC20("Agatobwe","ATT") 
-    ERC20Capped(20000 * (10**18)) 
+    //cap the supply of token to 20,000
+    constructor(address _multisig, address _router)
+        ERC20("Agatobwe", "ATT")
+        ERC20Capped(20000 * (10**18))
     {
         //set DEFAULT_ADMIN_ROLE to a multisig address controlled by Frigg
         //DEFAULT_ADMIN_ROLE is already implemented in AccessControl contract
@@ -29,17 +28,25 @@ contract ATT is ERC20Capped, AccessControl, IFrigg {
     }
 
     /// @dev this function only allows router to mint new tokens during primary market sale
-    function mint(address _to, uint256 _amount) public override onlyRole(ROUTER_ROLE) {
+    function mint(address _to, uint256 _amount)
+        public
+        override
+        onlyRole(ROUTER_ROLE)
+    {
         _mint(_to, _amount);
     }
 
     /// @dev this function only allows router to burn existing tokens when tokens reach expiry
-    function burn(address _from, uint256 _amount) public override onlyRole(ROUTER_ROLE) {
+    function burn(address _from, uint256 _amount)
+        public
+        override
+        onlyRole(ROUTER_ROLE)
+    {
         _burn(_from, _amount);
     }
 
     /// @dev as totalSupply = cap, this function returns false
-    function isPrimaryMarketActive() public override view returns (bool) {
+    function isPrimaryMarketActive() public view override returns (bool) {
         return totalSupply() < cap();
     }
 
@@ -51,8 +58,8 @@ contract ATT is ERC20Capped, AccessControl, IFrigg {
         isBondExpired = true;
     }
 
-    /// @dev getter function for router contract to access variable 
-    function seeBondExpiryStatus() public override view returns (bool) {
+    /// @dev getter function for router contract to access variable
+    function seeBondExpiryStatus() public view override returns (bool) {
         return isBondExpired;
     }
 
@@ -60,5 +67,3 @@ contract ATT is ERC20Capped, AccessControl, IFrigg {
     //To be updated before mainnet deployment
     string public override termsURL = "https://www.agatobwe.eco/terms-of-issue";
 }
-
-   
