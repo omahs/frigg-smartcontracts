@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../Token/IFrigg.sol";
+import "../Interfaces/IFrigg.sol";
+import "../Interfaces/IRouterGater.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/IAccessControl.sol";
@@ -13,6 +14,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 contract primaryRouter is AccessControl {
     /// Add Frigg issued tokens to this router
     mapping(address => TokenData) public tokenData;
+    address routerGater; 
 
     /// @notice TokenData Struct: Required attributes for added tokens
     /// @dev USDC-denominated price is always 6 decimals
@@ -40,8 +42,9 @@ contract primaryRouter is AccessControl {
     /// @notice Establish access control logic for this router
     /// @dev Set DEFAULT_ADMIN_ROLE to a multisig address controlled by Frigg
     /// @dev DEFAULT_ADMIN_ROLE is defined within OZ's AccessControl
-    constructor(address _multisig) {
+    constructor(address _multisig, address _routerGater) {
         _grantRole(DEFAULT_ADMIN_ROLE, _multisig);
+        routerGater = _routerGater;
     }
 
     ///  @dev Only allows DEFAULT_ADMIN_ROLE to add Frigg-issued tokens to this router
@@ -85,14 +88,8 @@ contract primaryRouter is AccessControl {
     function buy(address friggTokenAddress, uint256 inputTokenAmount) external {
         require(inputTokenAmount > 0, "You cannot buy with 0 token");
 
-        /// check for user balance of UID
-        require(
-            IERC1155(tokenData[friggTokenAddress].uIdContract).balanceOf(
-                msg.sender,
-                0
-            ) > 0,
-            "Need a UID token"
-        );
+        IRouterGater gater = IRouterGater(routerGater);
+        require(gater.checkGatedStatus(msg.sender));
 
         IERC20 inputToken = IERC20(
             tokenData[friggTokenAddress].issuanceTokenAddress
@@ -133,14 +130,8 @@ contract primaryRouter is AccessControl {
     {
         require(inputFriggTokenAmount > 0, "You cannot sell 0 token");
 
-        /// check for user balance of UID
-        require(
-            IERC1155(tokenData[friggTokenAddress].uIdContract).balanceOf(
-                msg.sender,
-                0
-            ) > 0,
-            "Need a UID token"
-        );
+        IRouterGater gater = IRouterGater(routerGater);
+        require(gater.checkGatedStatus(msg.sender));
 
         IFrigg inputToken = IFrigg(friggTokenAddress);
         IERC20 outputToken = IERC20(
