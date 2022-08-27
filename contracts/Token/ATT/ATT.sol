@@ -18,6 +18,9 @@ contract ATT is ERC20Capped, AccessControl, IFrigg {
     /// @dev The default value is false
     bool public isBondExpired;
 
+    /// @dev The default value is true
+    bool public primaryMarketActive = true;
+
     /// @notice cap the supply of token to 20,000
     constructor(address _multisig, address _router)
         ERC20("Agatobwe", "ATT")
@@ -51,8 +54,13 @@ contract ATT is ERC20Capped, AccessControl, IFrigg {
 
     /// @dev If totalSupply = cap, this function returns false
     function isPrimaryMarketActive() public view override returns (bool) {
-        return totalSupply() < cap();
+        return totalSupply() < cap() && primaryMarketActive;
     }
+
+    ///@dev Issuer can manually close out primary market buy
+    function setPrimaryMarketActive(bool _setup) onlyRole(DEFAULT_ADMIN_ROLE){
+        primaryMarketActive = _setup;
+    } 
 
     /// @dev Getter function for router contract to access variable
     function seeBondExpiryStatus() public view override returns (bool) {
