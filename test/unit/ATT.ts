@@ -1,7 +1,8 @@
-import { smock } from '@defi-wonderland/smock';
+import { smock } from "@defi-wonderland/smock";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import chai, { expect } from "chai";
 import { ethers } from "hardhat";
+import { GOLDFINCH_UID, QUADRATA_UID } from "../integration/constants";
 
 chai.use(smock.matchers);
 
@@ -17,8 +18,10 @@ describe("ATT", function () {
 
     const ATT = await ethers.getContractFactory("ATT");
     const PRIMARY_ROUTER = await ethers.getContractFactory("primaryRouter");
-    const primaryRouter = await PRIMARY_ROUTER.deploy(MULTISIG);
+    const ROUTER_GATER = await ethers.getContractFactory("routerGater");
 
+    const routerGater = await ROUTER_GATER.deploy(MULTISIG, GOLDFINCH_UID, QUADRATA_UID);
+    const primaryRouter = await PRIMARY_ROUTER.deploy(MULTISIG, routerGater.address);
     const att = await ATT.deploy(MULTISIG, primaryRouter.address);
     const myContractFake = await smock.fake(att);
     return { att, primaryRouter, owner, addr1, myContractFake };
@@ -26,7 +29,7 @@ describe("ATT", function () {
 
   // Testing the behaviour of the contract function "isPrimaryMarketActive"
   describe("Check primary market", function () {
-    // Test if primary market is active, default = true 
+    // Test if primary market is active, default = true
     it("Check if primary market is active", async function () {
       const { att } = await getContractsFixture();
       expect(await att.isPrimaryMarketActive()).to.equal(true);
@@ -35,16 +38,16 @@ describe("ATT", function () {
     // Test if primaryMarket returns false when supply & cap are identical
     it("Should return false when totalSupply = cap", async function () {
       const { myContractFake } = await getContractsFixture();
-      myContractFake.totalSupply.returns(10)
-      myContractFake.cap.returns(10)
+      myContractFake.totalSupply.returns(10);
+      myContractFake.cap.returns(10);
       expect(await myContractFake.isPrimaryMarketActive()).to.equal(false);
     });
 
     // Test if primaryMarket returns false when supply is > than cap
     it("Should return false when totalSupply > cap", async function () {
       const { myContractFake } = await getContractsFixture();
-      myContractFake.totalSupply.returns(10)
-      myContractFake.cap.returns(5)
+      myContractFake.totalSupply.returns(10);
+      myContractFake.cap.returns(5);
       expect(await myContractFake.isPrimaryMarketActive()).to.equal(false);
     });
   });
@@ -65,6 +68,6 @@ describe("ATT", function () {
   it("Should set bond expiry to true", async function () {
     const { att, addr1 } = await loadFixture(getContractsFixture);
     expect(await att.connect(addr1).setBondExpiry());
-    expect(await att.seeBondExpiryStatus()).to.equal(true)
+    expect(await att.seeBondExpiryStatus()).to.equal(true);
   });
 });

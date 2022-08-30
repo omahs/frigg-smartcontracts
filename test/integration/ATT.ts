@@ -1,6 +1,7 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { GOLDFINCH_UID, QUADRATA_UID } from "./constants";
 
 // Integration Tests for ATT.sol
 describe("ATT", function () {
@@ -10,13 +11,15 @@ describe("ATT", function () {
   */
   async function getContractsFixture() {
     const [owner, addr1] = await ethers.getSigners();
+    // Owner Address is set as Default Admin on Router
     const MULTISIG = owner.address;
 
-    const ATT = await ethers.getContractFactory("ATT", owner);
-    const PRIMARY_ROUTER = await ethers.getContractFactory("primaryRouter", owner);
-    const primaryRouter = await PRIMARY_ROUTER.deploy(MULTISIG);
+    const ATT = await ethers.getContractFactory("ATT");
+    const PRIMARY_ROUTER = await ethers.getContractFactory("primaryRouter");
+    const ROUTER_GATER = await ethers.getContractFactory("routerGater");
 
-    // Owner Address is set as Default Admin on Router
+    const routerGater = await ROUTER_GATER.deploy(MULTISIG, GOLDFINCH_UID, QUADRATA_UID);
+    const primaryRouter = await PRIMARY_ROUTER.deploy(MULTISIG, routerGater.address);
     const att = await ATT.deploy(MULTISIG, owner.address);
     return { att, primaryRouter, owner, addr1 };
   }

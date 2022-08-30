@@ -14,7 +14,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 contract primaryRouter is AccessControl {
     /// Add Frigg issued tokens to this router
     mapping(address => TokenData) public tokenData;
-    address routerGater; 
+    address routerGater;
 
     /// @notice TokenData Struct: Required attributes for added tokens
     /// @dev USDC-denominated price is always 6 decimals
@@ -27,17 +27,9 @@ contract primaryRouter is AccessControl {
     }
 
     /// Allow microsite front-end to listen to events and show recent primary market activity
-    event SuccessfulPurchase(
-        address indexed _buyer,
-        address _friggTokenAddress,
-        uint256 _amount
-    );
+    event SuccessfulPurchase(address indexed _buyer, address _friggTokenAddress, uint256 _amount);
 
-    event SuccessfulExpiration(
-        address indexed _seller,
-        address _friggTokenAddress,
-        uint256 _amount
-    );
+    event SuccessfulExpiration(address indexed _seller, address _friggTokenAddress, uint256 _amount);
 
     /// @notice Establish access control logic for this router
     /// @dev Set DEFAULT_ADMIN_ROLE to a multisig address controlled by Frigg
@@ -91,31 +83,20 @@ contract primaryRouter is AccessControl {
         IRouterGater gater = IRouterGater(routerGater);
         require(gater.checkGatedStatus(msg.sender));
 
-        IERC20 inputToken = IERC20(
-            tokenData[friggTokenAddress].issuanceTokenAddress
-        );
+        IERC20 inputToken = IERC20(tokenData[friggTokenAddress].issuanceTokenAddress);
         IFrigg outputToken = IFrigg(friggTokenAddress);
 
         /// check that primary market is active
         require(outputToken.isPrimaryMarketActive());
 
-        inputToken.transferFrom(
-            msg.sender,
-            tokenData[friggTokenAddress].issuer,
-            inputTokenAmount
-        );
+        inputToken.transferFrom(msg.sender, tokenData[friggTokenAddress].issuer, inputTokenAmount);
 
         /// if inputTokenAmount is 1 USDC * 10^6, outputTokenAmount is 1 ATT * 10^18, issuancePrice is 1 ATT:1 USDC * 10^12
-        uint256 outputTokenAmount = inputTokenAmount *
-            tokenData[friggTokenAddress].issuancePrice;
+        uint256 outputTokenAmount = inputTokenAmount * tokenData[friggTokenAddress].issuancePrice;
 
         outputToken.mint(msg.sender, outputTokenAmount);
 
-        emit SuccessfulPurchase(
-            msg.sender,
-            friggTokenAddress,
-            inputTokenAmount
-        );
+        emit SuccessfulPurchase(msg.sender, friggTokenAddress, inputTokenAmount);
     }
 
     /// @notice Sell widget logic for primary market
@@ -125,38 +106,25 @@ contract primaryRouter is AccessControl {
     /// @param inputFriggTokenAmount amount of Frigg tokens for sale
     /// i.e. inputToken is ABT and outputToken is USDC
     /// @dev inputFriggTokenAmount should be in 18 decimals
-    function sell(address friggTokenAddress, uint256 inputFriggTokenAmount)
-        external
-    {
+    function sell(address friggTokenAddress, uint256 inputFriggTokenAmount) external {
         require(inputFriggTokenAmount > 0, "You cannot sell 0 token");
 
         IRouterGater gater = IRouterGater(routerGater);
         require(gater.checkGatedStatus(msg.sender));
 
         IFrigg inputToken = IFrigg(friggTokenAddress);
-        IERC20 outputToken = IERC20(
-            tokenData[friggTokenAddress].issuanceTokenAddress
-        );
+        IERC20 outputToken = IERC20(tokenData[friggTokenAddress].issuanceTokenAddress);
 
         require(inputToken.seeBondExpiryStatus());
 
         inputToken.burn(msg.sender, inputFriggTokenAmount);
 
         /// if inputFriggTokenAmount is 1 ATT * 10^18, expiryPrice is 1.5 USDC : 1 ATT * 10^12, outputTokenAmount is 1.5 USDC * 10^6
-        uint256 outputTokenAmount = inputFriggTokenAmount /
-            tokenData[friggTokenAddress].expiryPrice;
+        uint256 outputTokenAmount = inputFriggTokenAmount / tokenData[friggTokenAddress].expiryPrice;
 
         /// Issuer smart contract address should give approval to router to transfer USDC to msg.sender prior to bond expiry
-        outputToken.transferFrom(
-            tokenData[friggTokenAddress].issuer,
-            msg.sender,
-            outputTokenAmount
-        );
+        outputToken.transferFrom(tokenData[friggTokenAddress].issuer, msg.sender, outputTokenAmount);
 
-        emit SuccessfulExpiration(
-            msg.sender,
-            friggTokenAddress,
-            inputFriggTokenAmount
-        );
+        emit SuccessfulExpiration(msg.sender, friggTokenAddress, inputFriggTokenAmount);
     }
 }
