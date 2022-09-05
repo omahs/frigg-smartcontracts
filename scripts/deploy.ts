@@ -1,15 +1,17 @@
 import { ethers } from "hardhat";
-import { GOLDFINCH_UID_TESTNET, USDC_ADDRESS_TESTNET } from "../test/integration/constants";
+import { GOLDFINCH_UID_TESTNET, QUADRATA_UID_TESTNET, USDC_ADDRESS_TESTNET } from "../test/integration/constants";
 
 async function main() {
   const [owner] = await ethers.getSigners();
 
   const MULTISIG = owner.address;
 
+  const routerGaterContract = await ethers.getContractFactory("routerGater");
   const primaryRouterContract = await ethers.getContractFactory("primaryRouter");
   const attContract = await ethers.getContractFactory("ATT");
 
-  const primaryRouter = await primaryRouterContract.deploy(MULTISIG);
+  const routerGater = await routerGaterContract.deploy(MULTISIG, GOLDFINCH_UID_TESTNET, QUADRATA_UID_TESTNET);
+  const primaryRouter = await primaryRouterContract.deploy(MULTISIG, routerGater.address);
   const att = await attContract.deploy(MULTISIG, primaryRouter.address);
 
   const tokenData = {
@@ -33,6 +35,7 @@ async function main() {
     tokenData.issuanceTokenAddress
   );
 
+  console.log(`Routre Gater deployed: https://goerli.etherscan.io/address/${routerGater.address}`);
   console.log(`Primary Router deployed: https://goerli.etherscan.io/address/${primaryRouter.address}`);
   console.log(`ATT Token deployed: https://goerli.etherscan.io/address/${att.address}`);
 }
