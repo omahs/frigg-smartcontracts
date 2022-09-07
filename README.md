@@ -1,8 +1,10 @@
 # Smart Contracts
 
+This documentation is meant to be private
+
 ## Audits
 
-<TBD>
+Audited by Axelra Labs. Report available here (https://friggeco-my.sharepoint.com/:b:/g/personal/philip_berntsen_frigg_eco/Eagz5LGhOsFPrF7VlTujf1oBmhB6YAnOq30tpLKa3RJsAw?e=82q4gL)
 
 ---
 
