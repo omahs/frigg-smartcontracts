@@ -33,9 +33,7 @@ Audited by Axelra Labs. Report available here (https://friggeco-my.sharepoint.co
 
 ## Governance
 
-- How is changes to Router / Token contract (e.g., when bond matures) governed (does changes to GitHub repo automatically adjust smart contract? Does it need to be signed by 2 parties / wallets? etc..)
-- Changes to Router redeployed
-- \_grantrole at token contracts
+Logic is available on Microsoft Whiteboard here (https://friggeco-my.sharepoint.com/:wb:/g/personal/jack_chong_frigg_eco/EXK9aFawTcVDmgGW3uFAJwUBGNE7OXfZDIkfbzSOFHMgAg?e=g8p9UL)
 
 ---
 
