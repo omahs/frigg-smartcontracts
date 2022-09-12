@@ -78,10 +78,11 @@ contract primaryRouter is AccessControl {
     /// i.e. inputToken is USDC and outputToken is the ABT
     /// @dev inputTokenAmount should be in the same number of decimals as issuanceTokenAddress implemented
     function buy(address friggTokenAddress, uint256 inputTokenAmount) external {
-        require(inputTokenAmount > 0, "You cannot buy with 0 token");
-
+        // puts the gater require condition first for potential gas return to users
         IRouterGater gater = IRouterGater(routerGater);
-        require(gater.checkGatedStatus(msg.sender));
+        require(gater.checkGatedStatus(msg.sender),"Your wallet is not eligible to buy");
+
+        require(inputTokenAmount > 0, "You cannot buy with 0 token");
 
         IERC20 inputToken = IERC20(tokenData[friggTokenAddress].issuanceTokenAddress);
         IFrigg outputToken = IFrigg(friggTokenAddress);
@@ -107,10 +108,11 @@ contract primaryRouter is AccessControl {
     /// i.e. inputToken is ABT and outputToken is USDC
     /// @dev inputFriggTokenAmount should be in 18 decimals
     function sell(address friggTokenAddress, uint256 inputFriggTokenAmount) external {
-        require(inputFriggTokenAmount > 0, "You cannot sell 0 token");
-
+        // puts the gater require condition first for potential gas return to users
         IRouterGater gater = IRouterGater(routerGater);
-        require(gater.checkGatedStatus(msg.sender));
+        require(gater.checkGatedStatus(msg.sender), "Your wallet is not eligible to sell");
+        
+        require(inputFriggTokenAmount > 0, "You cannot sell 0 token");
 
         IFrigg inputToken = IFrigg(friggTokenAddress);
         IERC20 outputToken = IERC20(tokenData[friggTokenAddress].issuanceTokenAddress);

@@ -101,6 +101,7 @@ contract routerGater is AccessControl, IRouterGater {
 
     /// @notice For primaryRouter.sol to access if an address passes the gating conditions
     function checkGatedStatus(address _account) external payable override returns (bool _gatedStatus) {
-        return (goldfinchLogic(_account) || quadrataLogic(_account));
+        require(goldfinchLogic(_account) || quadrataLogic(_account), "You do not pass the gated checks");
+        return true;
     }
 }
