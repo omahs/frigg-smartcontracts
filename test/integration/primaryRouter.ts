@@ -4,7 +4,7 @@ import chai, { expect } from "chai";
 import chaiString from "chai-string";
 import { ethers } from "hardhat";
 import USDC_ABI from "./artifacts/USDC.json";
-import { GOLDFINCH_UID, GOLDFINCH_UID_TESTNET, QUADRATA_UID, USDC_ADDRESS, USDC_ADDRESS_TESTNET } from "./constants";
+import { GOLDFINCH_UID, QUADRATA_UID, USDC_ADDRESS } from "./constants";
 
 chai.use(chaiString);
 chai.use(smock.matchers);
@@ -29,7 +29,6 @@ describe("primaryRouter", function () {
 
     const tokenData = {
       outputTokenAddress: att.address,
-      uIdContract: GOLDFINCH_UID,
       issuer: owner.address,
       issuancePrice: 1000000000000,
       expiryPrice: 666666666666,
@@ -47,11 +46,10 @@ describe("primaryRouter", function () {
 
     return {
       att,
+      routerGater,
       primaryRouter,
       owner,
       addr1,
-      USDC_ADDRESS,
-      GOLDFINCH_UID,
       tokenData,
       myContractFake,
       uidAccount,
@@ -68,7 +66,6 @@ describe("primaryRouter", function () {
           .connect(addr1)
           .add(
             tokenData.outputTokenAddress,
-            tokenData.uIdContract,
             tokenData.issuer,
             tokenData.issuancePrice,
             tokenData.expiryPrice,
@@ -83,7 +80,6 @@ describe("primaryRouter", function () {
       await expect(
         primaryRouter.add(
           myContractFake.address,
-          tokenData.uIdContract,
           tokenData.issuer,
           tokenData.issuancePrice,
           tokenData.expiryPrice,
@@ -98,7 +94,6 @@ describe("primaryRouter", function () {
 
       await primaryRouter.add(
         tokenData.outputTokenAddress,
-        tokenData.uIdContract,
         tokenData.issuer,
         tokenData.issuancePrice,
         tokenData.expiryPrice,
@@ -108,7 +103,6 @@ describe("primaryRouter", function () {
 
       // Checks if the stored struct is indentical to our defined data object
       expect(tokenData.issuer).to.equalIgnoreCase(data["issuer"]);
-      expect(tokenData.uIdContract).to.equalIgnoreCase(data["uIdContract"]);
       expect(tokenData.issuancePrice).to.equal(ethers.BigNumber.from(data["issuancePrice"]).toNumber());
       expect(tokenData.expiryPrice).to.equal(ethers.BigNumber.from(data["expiryPrice"]).toNumber());
       expect(tokenData.issuanceTokenAddress).to.equalIgnoreCase(data["issuanceTokenAddress"]);
@@ -141,7 +135,6 @@ describe("primaryRouter", function () {
       const { att, primaryRouter, tokenData, uidAccount } = await loadFixture(getContractsFixture);
       await primaryRouter.add(
         tokenData.outputTokenAddress,
-        tokenData.uIdContract,
         tokenData.issuer,
         tokenData.issuancePrice,
         tokenData.expiryPrice,
@@ -152,10 +145,9 @@ describe("primaryRouter", function () {
 
     // Test if the buy function transfers the tokens to the recipient & emits a 'SuccessfulPurchase' Event
     it("Transfer Token to buyer", async function () {
-      const { att, primaryRouter, tokenData, USDC_ADDRESS, uidAccount } = await loadFixture(getContractsFixture);
+      const { att, primaryRouter, tokenData, uidAccount } = await loadFixture(getContractsFixture);
       await primaryRouter.add(
         tokenData.outputTokenAddress,
-        tokenData.uIdContract,
         tokenData.issuer,
         tokenData.issuancePrice,
         tokenData.expiryPrice,
@@ -195,7 +187,6 @@ describe("primaryRouter", function () {
       const { att, primaryRouter, tokenData, uidAccount } = await loadFixture(getContractsFixture);
       await primaryRouter.add(
         tokenData.outputTokenAddress,
-        tokenData.uIdContract,
         tokenData.issuer,
         tokenData.issuancePrice,
         tokenData.expiryPrice,
@@ -206,10 +197,9 @@ describe("primaryRouter", function () {
 
     // Test if the sell function transfers the tokens to the issuer & emits a 'SuccessfulExpiration' Event
     it("Transfer Token to issuer", async function () {
-      const { att, primaryRouter, tokenData, USDC_ADDRESS, uidAccount } = await loadFixture(getContractsFixture);
+      const { att, primaryRouter, tokenData, uidAccount } = await loadFixture(getContractsFixture);
       await primaryRouter.add(
         tokenData.outputTokenAddress,
-        tokenData.uIdContract,
         tokenData.issuer,
         tokenData.issuancePrice,
         tokenData.expiryPrice,
@@ -223,6 +213,22 @@ describe("primaryRouter", function () {
       await expect(primaryRouter.connect(uidAccount).sell(att.address, 1))
         .to.emit(primaryRouter, "SuccessfulExpiration")
         .withArgs(uidAccount.address, tokenData.outputTokenAddress, 1);
+    });
+  });
+
+  describe("Change Router Gater Address", function () {
+    // Test if the update router gater function can be called by non-admins
+    it("Should revert because caller is not router admin", async function () {
+      const { addr1, primaryRouter, routerGater } = await loadFixture(getContractsFixture);
+      await expect(primaryRouter.connect(addr1).updateRouterGaterAddress(routerGater.address)).to.be.reverted;
+    });
+
+    // Test if the update router gater function can be called by admins
+    it("Should revert because caller is not router admin", async function () {
+      const { primaryRouter, routerGater } = await loadFixture(getContractsFixture);
+      expect(await primaryRouter.routerGater()).to.equalIgnoreCase(routerGater.address);
+      await primaryRouter.updateRouterGaterAddress(USDC_ADDRESS);
+      expect(await primaryRouter.routerGater()).to.equalIgnoreCase(USDC_ADDRESS);
     });
   });
 });

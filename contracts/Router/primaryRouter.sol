@@ -14,13 +14,12 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 contract primaryRouter is AccessControl {
     /// Add Frigg issued tokens to this router
     mapping(address => TokenData) public tokenData;
-    address routerGater;
+    address public routerGater;
 
     /// @notice TokenData Struct: Required attributes for added tokens
     /// @dev USDC-denominated price is always 6 decimals
     struct TokenData {
         address issuer; // address of the token issuer
-        address uIdContract; // address of User ID contracts accepted for this issuance
         uint256 issuancePrice; // price = (1 * 10^18) / (USD * 10^6) e.g., 100USD = 10^18/10^8
         uint256 expiryPrice; // price = (1/(expirydigit) * 10^18) / (USD * 10^6) e.g., 200USD = 10^18/20^8
         address issuanceTokenAddress; // address of token accepted as a denominated token e.g. USDC
@@ -41,14 +40,12 @@ contract primaryRouter is AccessControl {
 
     ///  @dev Only allows DEFAULT_ADMIN_ROLE to add Frigg-issued tokens to this router
     ///  @param _outputTokenAddress Frigg-issued token address
-    ///  @param _uIdContract Whitelister contract address
     ///  @param _issuer Issuer address to receive issuance proceeds
     ///  @param _issuancePrice Price of token at issuance
     ///  @param _expiryPrice Price of token at expiry date
     ///  @param _issuanceTokenAddress Address of Accepted token to purchase Frigg-issued token
     function add(
         address _outputTokenAddress,
-        address _uIdContract,
         address _issuer,
         uint256 _issuancePrice,
         uint256 _expiryPrice,
@@ -62,13 +59,7 @@ contract primaryRouter is AccessControl {
             outputToken.hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
             "only admins and only Frigg-issued tokens can be added the token to this router"
         );
-        tokenData[_outputTokenAddress] = TokenData(
-            _issuer,
-            _uIdContract,
-            _issuancePrice,
-            _expiryPrice,
-            _issuanceTokenAddress
-        );
+        tokenData[_outputTokenAddress] = TokenData(_issuer, _issuancePrice, _expiryPrice, _issuanceTokenAddress);
     }
 
     /// @notice Buy widget logic for primary market
@@ -78,11 +69,11 @@ contract primaryRouter is AccessControl {
     /// i.e. inputToken is USDC and outputToken is the ABT
     /// @dev inputTokenAmount should be in the same number of decimals as issuanceTokenAddress implemented
     function buy(address friggTokenAddress, uint256 inputTokenAmount) external {
-        // puts the gater require condition first for potential gas return to users
-        IRouterGater gater = IRouterGater(routerGater);
-        require(gater.checkGatedStatus(msg.sender),"Your wallet is not eligible to buy");
-
         require(inputTokenAmount > 0, "You cannot buy with 0 token");
+
+        /// Puts the gater require condition for potential gas return to users
+        IRouterGater gater = IRouterGater(routerGater);
+        require(gater.checkGatedStatus(msg.sender), "Your wallet is not eligible to buy");
 
         IERC20 inputToken = IERC20(tokenData[friggTokenAddress].issuanceTokenAddress);
         IFrigg outputToken = IFrigg(friggTokenAddress);
@@ -108,11 +99,11 @@ contract primaryRouter is AccessControl {
     /// i.e. inputToken is ABT and outputToken is USDC
     /// @dev inputFriggTokenAmount should be in 18 decimals
     function sell(address friggTokenAddress, uint256 inputFriggTokenAmount) external {
-        // puts the gater require condition first for potential gas return to users
+        require(inputFriggTokenAmount > 0, "You cannot sell 0 token");
+
+        /// Puts the gater require condition for potential gas return to users
         IRouterGater gater = IRouterGater(routerGater);
         require(gater.checkGatedStatus(msg.sender), "Your wallet is not eligible to sell");
-        
-        require(inputFriggTokenAmount > 0, "You cannot sell 0 token");
 
         IFrigg inputToken = IFrigg(friggTokenAddress);
         IERC20 outputToken = IERC20(tokenData[friggTokenAddress].issuanceTokenAddress);
@@ -128,5 +119,11 @@ contract primaryRouter is AccessControl {
         outputToken.transferFrom(tokenData[friggTokenAddress].issuer, msg.sender, outputTokenAmount);
 
         emit SuccessfulExpiration(msg.sender, friggTokenAddress, inputFriggTokenAmount);
+    }
+
+    /// @notice Update routerGater address
+    /// @dev Only routeradmin can update this address
+    function updateRouterGaterAddress(address _routerGater) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        routerGater = _routerGater;
     }
 }

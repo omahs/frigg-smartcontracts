@@ -16,7 +16,6 @@ async function main() {
 
   const tokenData = {
     outputTokenAddress: att.address,
-    uIdContract: GOLDFINCH_UID_TESTNET,
     issuer: MULTISIG,
     issuancePrice: 1000000000000,
     expiryPrice: 666666666666,
@@ -28,7 +27,6 @@ async function main() {
 
   await primaryRouter.add(
     tokenData.outputTokenAddress,
-    tokenData.uIdContract,
     tokenData.issuer,
     tokenData.issuancePrice,
     tokenData.expiryPrice,

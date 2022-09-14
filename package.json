@@ -15,6 +15,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.7.3",
     "@openzeppelin/contracts-upgradeable": "^4.7.3",
+    "@quadrata/contracts": "^0.2.2",
     "@types/chai-string": "^1.4.2"
   },
   "scripts": {
