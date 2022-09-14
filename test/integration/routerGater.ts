@@ -1,8 +1,11 @@
 import { smock } from "@defi-wonderland/smock";
 import chai, { expect } from "chai";
 import { ethers } from "hardhat";
-import { GOLDFINCH_UID, GOLDFINCH_UID_TESTNET, QUADRATA_UID, QUADRATA_UID_TESTNET, USDC_ADDRESS_TESTNET } from "./constants";
-import ABI from "./artifacts/QuadPassport.json";
+import {
+  GOLDFINCH_UID,
+  GOLDFINCH_UID_TESTNET,
+  QUADRATA_UID
+} from "./constants";
 
 chai.use(smock.matchers);
 
