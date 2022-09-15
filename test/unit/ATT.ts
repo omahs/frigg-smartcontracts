@@ -2,7 +2,7 @@ import { smock } from "@defi-wonderland/smock";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import chai, { expect } from "chai";
 import { ethers } from "hardhat";
-import { GOLDFINCH_UID, QUADRATA_UID } from "../integration/constants";
+import { GOLDFINCH_UID_TESTNET, QUADRATA_UID_TESTNET } from "../integration/constants";
 
 chai.use(smock.matchers);
 
@@ -20,7 +20,7 @@ describe("ATT", function () {
     const PRIMARY_ROUTER = await ethers.getContractFactory("primaryRouter");
     const ROUTER_GATER = await ethers.getContractFactory("routerGater");
 
-    const routerGater = await ROUTER_GATER.deploy(MULTISIG, GOLDFINCH_UID, QUADRATA_UID);
+    const routerGater = await ROUTER_GATER.deploy(MULTISIG, GOLDFINCH_UID_TESTNET, QUADRATA_UID_TESTNET);
     const primaryRouter = await PRIMARY_ROUTER.deploy(MULTISIG, routerGater.address);
     const att = await ATT.deploy(MULTISIG, primaryRouter.address);
     const myContractFake = await smock.fake(att);

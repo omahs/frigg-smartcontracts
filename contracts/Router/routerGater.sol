@@ -36,7 +36,7 @@ contract routerGater is AccessControl, IRouterGater {
         acceptedGoldfinchIds[2] = false;
         acceptedGoldfinchIds[3] = false;
         acceptedGoldfinchIds[4] = true;
-        quadrataBlockedCountries["US"] = true;
+        quadrataBlockedCountries[keccak256("US")] = true;
     }
 
     /// @notice Establishes logic for gating via Goldfinch's UID https://docs.goldfinch.finance/goldfinch/unique-identity-uid
@@ -50,11 +50,11 @@ contract routerGater is AccessControl, IRouterGater {
     }
 
     function goldfinchLogic(address _account) public view override returns (bool _gatedStatus) {
-        uint256 goldfinchID_TYPE_LENGTH = goldfinchIds.length;
+        uint256 goldfinchIdsLength = goldfinchIds.length;
 
         IERC1155 goldfinchUID = IERC1155(goldfinchUIDAddress);
 
-        for (uint8 i = 0; i < goldfinchID_TYPE_LENGTH; ) {
+        for (uint8 i = 0; i < goldfinchIdsLength; ) {
             if (goldfinchUID.balanceOf(_account, i) > 0 && acceptedGoldfinchIds[i]) {
                 return true;
             }

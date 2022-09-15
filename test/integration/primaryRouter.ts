@@ -3,7 +3,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import chai, { expect } from "chai";
 import chaiString from "chai-string";
 import { ethers } from "hardhat";
-import USDC_ABI from "./artifacts/USDC.json";
+import USDC_ABI from "../integration/_artifacts/USDC.json";
 import { GOLDFINCH_UID, QUADRATA_UID, USDC_ADDRESS } from "./constants";
 
 chai.use(chaiString);
@@ -114,20 +114,23 @@ describe("primaryRouter", function () {
     // Test if the buy function can be called with 0 amount of tokens
     it("Should revert because inputToken needs to be > 0", async function () {
       const { att, primaryRouter } = await loadFixture(getContractsFixture);
-      await expect(primaryRouter.buy(att.address, 0)).to.be.revertedWith("You cannot buy with 0 token");
+      await expect(primaryRouter.buy(att.address, 0, { value: ethers.utils.parseEther("0.0024") })).to.be.revertedWith(
+        "You cannot buy with 0 token"
+      );
     });
 
     // Test if the buy function can be called without a valid UID Token
     it("Should revert because account has no UID Token", async function () {
       const { att, primaryRouter } = await loadFixture(getContractsFixture);
-      await expect(primaryRouter.buy(att.address, 10)).to.be.reverted;
+      await expect(primaryRouter.buy(att.address, 10, { value: ethers.utils.parseEther("0.0024") })).to.be.reverted;
     });
 
     // Test if the buy function can be called when primary market isn't active
     it("Should revert because primary Market is not active", async function () {
       const { primaryRouter, myContractFake } = await loadFixture(getContractsFixture);
       myContractFake.isPrimaryMarketActive.returns(false);
-      await expect(primaryRouter.buy(myContractFake.address, 10)).to.be.reverted;
+      await expect(primaryRouter.buy(myContractFake.address, 10, { value: ethers.utils.parseEther("0.0024") })).to.be
+        .reverted;
     });
 
     // Test if the buy function can be called without any erc20 allowance
@@ -140,7 +143,8 @@ describe("primaryRouter", function () {
         tokenData.expiryPrice,
         tokenData.issuanceTokenAddress
       );
-      await expect(primaryRouter.connect(uidAccount).buy(att.address, 1)).to.be.reverted;
+      await expect(primaryRouter.connect(uidAccount).buy(att.address, 1, { value: ethers.utils.parseEther("0.0024") }))
+        .to.be.reverted;
     });
 
     // Test if the buy function transfers the tokens to the recipient & emits a 'SuccessfulPurchase' Event
@@ -155,8 +159,8 @@ describe("primaryRouter", function () {
       );
       const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI);
       await usdcContract.connect(uidAccount).approve(primaryRouter.address, 100000000);
-      await primaryRouter.connect(uidAccount).buy(att.address, 1);
-      await expect(primaryRouter.connect(uidAccount).buy(att.address, 1))
+      await primaryRouter.connect(uidAccount).buy(att.address, 1, { value: ethers.utils.parseEther("0.0024") });
+      await expect(primaryRouter.connect(uidAccount).buy(att.address, 1, { value: ethers.utils.parseEther("0.0024") }))
         .to.emit(primaryRouter, "SuccessfulPurchase")
         .withArgs(uidAccount.address, tokenData.outputTokenAddress, 1);
     });
@@ -167,19 +171,23 @@ describe("primaryRouter", function () {
     // Test if the sell function can be called with 0 amount of tokens
     it("Should revert because inputToken needs to be > 0", async function () {
       const { att, primaryRouter } = await loadFixture(getContractsFixture);
-      await expect(primaryRouter.sell(att.address, 0)).to.be.revertedWith("You cannot sell 0 token");
+      await expect(primaryRouter.sell(att.address, 0, { value: ethers.utils.parseEther("0.0024") })).to.be.revertedWith(
+        "You cannot sell 0 token"
+      );
     });
 
     // Test if the sell function can be called without a valid UID Token
     it("Should revert because account has no UID Token", async function () {
       const { att, primaryRouter } = await loadFixture(getContractsFixture);
-      await expect(primaryRouter.sell(att.address, 10)).to.be.reverted;
+      await expect(primaryRouter.sell(att.address, 10, { value: ethers.utils.parseEther("0.0024") })).to.be.reverted;
     });
 
     // Test if the sell function can be called when the bond hasn't been expired yet
     it("Should revert because expiry date is not active", async function () {
       const { att, primaryRouter, uidAccount } = await loadFixture(getContractsFixture);
-      await expect(primaryRouter.connect(uidAccount).sell(att.address, 10)).to.be.reverted;
+      await expect(
+        primaryRouter.connect(uidAccount).sell(att.address, 10, { value: ethers.utils.parseEther("0.0024") })
+      ).to.be.reverted;
     });
 
     // Test if the sell function can be called without any erc20 allowance
@@ -192,7 +200,8 @@ describe("primaryRouter", function () {
         tokenData.expiryPrice,
         tokenData.issuanceTokenAddress
       );
-      await expect(primaryRouter.connect(uidAccount).sell(att.address, 1)).to.be.reverted;
+      await expect(primaryRouter.connect(uidAccount).sell(att.address, 1, { value: ethers.utils.parseEther("0.0024") }))
+        .to.be.reverted;
     });
 
     // Test if the sell function transfers the tokens to the issuer & emits a 'SuccessfulExpiration' Event
@@ -207,10 +216,10 @@ describe("primaryRouter", function () {
       );
       const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI);
       await usdcContract.connect(uidAccount).approve(primaryRouter.address, 100000000);
-      await primaryRouter.connect(uidAccount).buy(att.address, 1);
+      await primaryRouter.connect(uidAccount).buy(att.address, 1, { value: ethers.utils.parseEther("0.0024") });
       await att.setBondExpiry();
-      await primaryRouter.connect(uidAccount).sell(att.address, 1);
-      await expect(primaryRouter.connect(uidAccount).sell(att.address, 1))
+      await primaryRouter.connect(uidAccount).sell(att.address, 1, { value: ethers.utils.parseEther("0.0024") });
+      await expect(primaryRouter.connect(uidAccount).sell(att.address, 1, { value: ethers.utils.parseEther("0.0024") }))
         .to.emit(primaryRouter, "SuccessfulExpiration")
         .withArgs(uidAccount.address, tokenData.outputTokenAddress, 1);
     });

@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "../Interfaces/IFrigg.sol";
 import "../Interfaces/IRouterGater.sol";
+import "../Interfaces/IPrimaryRouter.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/IAccessControl.sol";
@@ -11,7 +12,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 /// @title A router contract for primary market activity for Frigg Asset-Backed Tokens (ABT)
 /// @author Frigg team
 /// @dev Inherits from the OpenZepplin AccessControl
-contract primaryRouter is AccessControl {
+contract primaryRouter is AccessControl, IPrimaryRouter {
     /// Add Frigg issued tokens to this router
     mapping(address => TokenData) public tokenData;
     address public routerGater;
@@ -50,9 +51,8 @@ contract primaryRouter is AccessControl {
         uint256 _issuancePrice,
         uint256 _expiryPrice,
         address _issuanceTokenAddress
-    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) external {
         IAccessControl outputToken = IAccessControl(_outputTokenAddress);
-        bytes32 DEFAULT_ADMIN_ROLE = 0x00;
 
         // require only admin of the Frigg-issued token can add token to router
         require(
@@ -68,12 +68,12 @@ contract primaryRouter is AccessControl {
     /// @dev initially users can only buy Frigg-issued asset backed tokens with USDC
     /// i.e. inputToken is USDC and outputToken is the ABT
     /// @dev inputTokenAmount should be in the same number of decimals as issuanceTokenAddress implemented
-    function buy(address friggTokenAddress, uint256 inputTokenAmount) external {
+    function buy(address friggTokenAddress, uint256 inputTokenAmount) external payable override {
         require(inputTokenAmount > 0, "You cannot buy with 0 token");
 
         /// Puts the gater require condition for potential gas return to users
         IRouterGater gater = IRouterGater(routerGater);
-        require(gater.checkGatedStatus(msg.sender), "Your wallet is not eligible to buy");
+        require(gater.checkGatedStatus{value: msg.value}(msg.sender), "Your wallet is not eligible to buy");
 
         IERC20 inputToken = IERC20(tokenData[friggTokenAddress].issuanceTokenAddress);
         IFrigg outputToken = IFrigg(friggTokenAddress);
@@ -98,12 +98,12 @@ contract primaryRouter is AccessControl {
     /// @param inputFriggTokenAmount amount of Frigg tokens for sale
     /// i.e. inputToken is ABT and outputToken is USDC
     /// @dev inputFriggTokenAmount should be in 18 decimals
-    function sell(address friggTokenAddress, uint256 inputFriggTokenAmount) external {
+    function sell(address friggTokenAddress, uint256 inputFriggTokenAmount) external payable override {
         require(inputFriggTokenAmount > 0, "You cannot sell 0 token");
 
-        /// Puts the gater require condition for potential gas return to users
+        /// Puts the gater require condition for potential gas return Øto users
         IRouterGater gater = IRouterGater(routerGater);
-        require(gater.checkGatedStatus(msg.sender), "Your wallet is not eligible to sell");
+        require(gater.checkGatedStatus{value: msg.value}(msg.sender), "Your wallet is not eligible to sell");
 
         IFrigg inputToken = IFrigg(friggTokenAddress);
         IERC20 outputToken = IERC20(tokenData[friggTokenAddress].issuanceTokenAddress);
