@@ -26,6 +26,7 @@ Audited by Axelra Labs. Report available here (https://friggeco-my.sharepoint.co
 
 | Contract          | Mainnet | Testnet (Goerli) |
 | ----------------- | :-----: | ---------------: |
+| routerGater.sol   |         |                  |
 | primaryRouter.sol |         |                  |
 | ATT.sol           |         |                  |
 
