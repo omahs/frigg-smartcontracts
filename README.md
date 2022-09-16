@@ -35,6 +35,8 @@ Audited by Axelra Labs. Report available here (https://friggeco-my.sharepoint.co
 
 Logic is available on Microsoft Whiteboard here (https://friggeco-my.sharepoint.com/:wb:/g/personal/jack_chong_frigg_eco/EXK9aFawTcVDmgGW3uFAJwUBGNE7OXfZDIkfbzSOFHMgAg?e=g8p9UL)
 
+![Screenshot 2022-09-16 at 2 08 34 PM](https://user-images.githubusercontent.com/62898158/190704331-e08603ae-6a42-4c25-9773-289a3e737c7b.png)
+
 ---
 
 ## Development
@@ -44,10 +46,10 @@ Logic is available on Microsoft Whiteboard here (https://friggeco-my.sharepoint.
 1. **routerGater.sol**
 
 - address \_multisig = Gnosis Safe Frigg.eco is granted `DEFAULT_ADMIN_ROLE` **(This account can change contract's state!)**
-- address \_goldfinchUIDAddress = Contract Address of GoldfinchUIDContract (e.g. Goerli: `0x10e55306017e67e395Ee2fAC36e9DA82c04A556D`, Mainnet: `0xba0439088dc1e75f58e0a7c107627942c15cbb41`)
-https://docs.goldfinch.finance/goldfinch/unique-identity-uid/for-developers
+- address \_goldfinchUIDAddress = Contract Address of GoldfinchUIDContract (e.g. Goerli deployed by ourselves as a standard ERC1155: `0x10e55306017e67e395Ee2fAC36e9DA82c04A556D`, Mainnet: `0xba0439088dc1e75f58e0a7c107627942c15cbb41`)
+Reference: https://docs.goldfinch.finance/goldfinch/unique-identity-uid/for-developers
 - address \_quadrataAddress = Contract Address of QuadReader (e.g. Goerli: `0x5C6b81212c0A654B6e247F8DEfeC9a95c63EF954`, Mainnet: `0xFEB98861425C6d2819c0d0Ee70E45AbcF71b43Da`) 
-https://docs.quadrata.com/integration/additional-information/smart-contracts
+Reference: https://docs.quadrata.com/integration/additional-information/smart-contracts
 
 ---
 
