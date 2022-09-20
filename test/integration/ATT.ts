@@ -26,6 +26,24 @@ describe("ATT", function () {
     return { att, primaryRouter, owner, addr1 };
   }
 
+  // Testing the behaviour of ATT's setPrimaryMarketActive function
+  describe("Update Primary Market State", function () {
+    // Test if a new token has been minted
+    it("Should revert because caller is not token admin", async function () {
+      const { att, addr1 } = await loadFixture(getContractsFixture);
+      await expect(att.connect(addr1).setPrimaryMarketActive(false)).to.be.reverted;
+    });
+
+    // Test if a new token has been minted
+    it("Set primaryMarket to false", async function () {
+      const { att, owner } = await loadFixture(getContractsFixture);
+      expect(await att.isPrimaryMarketActive()).to.equal(true);
+      att.connect(owner).setPrimaryMarketActive(false);
+
+      expect(await att.connect(owner).isPrimaryMarketActive()).to.equal(false);
+    });
+  });
+
   // Testing the behaviour of ATT's mint & burn functions
   describe("Mint & Burn Tokens", function () {
     const attAmount = 10;

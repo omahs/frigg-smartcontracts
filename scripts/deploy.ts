@@ -5,11 +5,11 @@ async function main() {
   const primaryRouterContract = await ethers.getContractFactory("primaryRouter");
   const attContract = await ethers.getContractFactory("ATT");
 
-  const ROUTER_MULTISIG = process.env.ROUTER_MULTISIG;
-  const TOKEN_MULTISIG = process.env.TOKEN_MULTISIG;
-  const GOLDFINCH_UID = process.env.GOLDFINCH_UID
-  const QUADRATA_UID = process.env.QUADRATA_UID
-  const USDC_ADDRESS = process.env.USDC_ADDRESS
+  const ROUTER_MULTISIG = process.env.ROUTER_MULTISIG!;
+  const TOKEN_MULTISIG = process.env.TOKEN_MULTISIG!;
+  const GOLDFINCH_UID = process.env.GOLDFINCH_UID!;
+  const QUADRATA_UID = process.env.QUADRATA_UID!;
+  const USDC_ADDRESS = process.env.USDC_ADDRESS!;
 
   const routerGater = await routerGaterContract.deploy(ROUTER_MULTISIG, GOLDFINCH_UID, QUADRATA_UID);
   const primaryRouter = await primaryRouterContract.deploy(ROUTER_MULTISIG, routerGater.address);
@@ -24,6 +24,7 @@ async function main() {
     issuanceTokenAddress: USDC_ADDRESS,
   };
 
+  await routerGater.deployed();
   await primaryRouter.deployed();
   await att.deployed();
 

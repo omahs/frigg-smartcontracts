@@ -4,6 +4,7 @@ import chai, { expect } from "chai";
 import chaiString from "chai-string";
 import { ethers } from "hardhat";
 import USDC_ABI from "../integration/_artifacts/USDC.json";
+import { VALID_QUADRATA_PASSPORT_HOLDER } from "./constants";
 
 chai.use(chaiString);
 chai.use(smock.matchers);
@@ -40,7 +41,7 @@ describe("primaryRouter", function () {
 
     const myContractFake = await smock.fake(att);
 
-    const uidAccount = await ethers.getImpersonatedSigner("0x335aE5dd1b3de7e80148B72Df0511167E2498187");
+    const uidAccount = await ethers.getImpersonatedSigner(VALID_QUADRATA_PASSPORT_HOLDER);
 
     await owner.sendTransaction({
       to: uidAccount.address,

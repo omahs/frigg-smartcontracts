@@ -79,6 +79,7 @@ contract routerGater is AccessControl, IRouterGater {
     /// @dev not internal function so that composable
     function quadrataLogic(address _account) public payable override returns (bool _gatedStatus) {
         IQuadReader quadrata = IQuadReader(quadrataAddress);
+        require(quadrata.balanceOf(_account, keccak256("DID")) > 0, "NO_PASSPORT_IN_WALLET");
 
         bytes32[] memory attributesToQuery = new bytes32[](2);
         attributesToQuery[0] = keccak256("COUNTRY");
@@ -86,16 +87,15 @@ contract routerGater is AccessControl, IRouterGater {
 
         /// get fee to query both `COUNTRY` & AML
         uint256 queryFeeBulk = quadrata.queryFeeBulk(_account, attributesToQuery);
-        require(msg.value == queryFeeBulk, "MISSING QUERY FEE");
+        require(msg.value == queryFeeBulk, "MISSING_QUERY_FEE");
 
         IQuadPassportStore.Attribute[] memory attributes = quadrata.getAttributesBulk{value: queryFeeBulk}(
             _account,
             attributesToQuery
         );
 
-        require(attributes.length == 2);
         require(!quadrataBlockedCountries[attributes[0].value], "BANNED_COUNTRY");
-        require(uint256(attributes[1].value) < 8, "High risk AML");
+        require(uint256(attributes[1].value) < 8, "HIGH_RISK_AML");
         return true;
     }
 

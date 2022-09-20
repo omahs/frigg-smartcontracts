@@ -4,6 +4,7 @@ import { ethers } from "hardhat";
 import {
   QUADRATA_INVALID_AML,
   QUADRATA_INVALID_COUNTRY,
+  VALID_QUADRATA_PASSPORT_HOLDER,
 } from "./constants";
 
 chai.use(smock.matchers);
@@ -43,7 +44,7 @@ describe("routerGater", function () {
       addr1,
       myContractFake,
       VALID_UID_HOLDERS,
-      INVALID_UID_HOLDERS,
+      INVALID_UID_HOLDERS
     };
   }
 
@@ -129,15 +130,15 @@ describe("routerGater", function () {
 
   describe("Test quadrata logic", function () {
     it("Should revert, because no query fee was provided for quadrata", async function () {
-      const { routerGater, addr1 } = await getContractsFixture();
-      await expect(routerGater.quadrataLogic(addr1.address)).to.be.revertedWith("MISSING QUERY FEE");
+      const { routerGater } = await getContractsFixture();
+      await expect(routerGater.quadrataLogic(QUADRATA_INVALID_AML)).to.be.revertedWith("MISSING_QUERY_FEE");
     });
 
     it("Should revert, because account has to high risk AML", async function () {
       const { routerGater } = await getContractsFixture();
       await expect(
         routerGater.quadrataLogic(QUADRATA_INVALID_AML, { value: ethers.utils.parseEther("0.0024") })
-      ).to.be.revertedWith("High risk AML");
+      ).to.be.revertedWith("HIGH_RISK_AML");
     });
 
     it("Should revert, because account has to high risk AML", async function () {
@@ -165,8 +166,8 @@ describe("routerGater", function () {
       });
 
       it("Should return true, because quadrata passport is valid", async function () {
-        const { routerGater, addr1 } = await getContractsFixture();
-        await expect(routerGater.checkGatedStatus(addr1.address, { value: ethers.utils.parseEther("0.0024") })).to.not
+        const { routerGater } = await getContractsFixture();
+        await expect(routerGater.checkGatedStatus(VALID_QUADRATA_PASSPORT_HOLDER, { value: ethers.utils.parseEther("0.0024") })).to.not
           .reverted;
       });
     });
