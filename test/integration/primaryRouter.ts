@@ -4,10 +4,13 @@ import chai, { expect } from "chai";
 import chaiString from "chai-string";
 import { ethers } from "hardhat";
 import USDC_ABI from "../integration/_artifacts/USDC.json";
-import { GOLDFINCH_UID, QUADRATA_UID, USDC_ADDRESS } from "./constants";
 
 chai.use(chaiString);
 chai.use(smock.matchers);
+
+const GOLDFINCH_UID = process.env.GOLDFINCH_UID!;
+const QUADRATA_UID = process.env.QUADRATA_UID!;
+const USDC_ADDRESS = process.env.USDC_ADDRESS!;
 
 // Integration Tests for primaryRouter.sol
 describe("primaryRouter", function () {

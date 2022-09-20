@@ -2,15 +2,14 @@ import { smock } from "@defi-wonderland/smock";
 import chai, { expect } from "chai";
 import { ethers } from "hardhat";
 import {
-  GOLDFINCH_UID,
-  GOLDFINCH_UID_TESTNET,
   QUADRATA_INVALID_AML,
   QUADRATA_INVALID_COUNTRY,
-  QUADRATA_UID,
-  QUADRATA_UID_TESTNET,
 } from "./constants";
 
 chai.use(smock.matchers);
+
+const GOLDFINCH_UID = process.env.GOLDFINCH_UID!;
+const QUADRATA_UID = process.env.QUADRATA_UID!;
 
 // Unit Tests for routerGater.sol
 describe("routerGater", function () {
@@ -34,7 +33,7 @@ describe("routerGater", function () {
       "0x91e795eB6a2307eDe1A0eeDe84e6F0914f60a9C3",
     ];
 
-    const routerGater = await ROUTER_GATER.deploy(owner.address, GOLDFINCH_UID_TESTNET, QUADRATA_UID_TESTNET);
+    const routerGater = await ROUTER_GATER.deploy(owner.address, GOLDFINCH_UID, QUADRATA_UID);
 
     const myContractFake = await smock.fake(routerGater);
 
@@ -51,12 +50,12 @@ describe("routerGater", function () {
   describe("Update UID Contract Addresses", function () {
     it("Should revert, cause the caller is no admin", async function () {
       const { routerGater, addr1 } = await getContractsFixture();
-      await expect(routerGater.connect(addr1).updateGoldfinchUIDAddress(GOLDFINCH_UID_TESTNET)).to.be.reverted;
+      await expect(routerGater.connect(addr1).updateGoldfinchUIDAddress(GOLDFINCH_UID)).to.be.reverted;
     });
 
     it("Should update the goldfinch uid contract address", async function () {
       const { routerGater } = await getContractsFixture();
-      expect(await routerGater.goldfinchUIDAddress()).to.equalIgnoreCase(GOLDFINCH_UID_TESTNET);
+      expect(await routerGater.goldfinchUIDAddress()).to.equalIgnoreCase(GOLDFINCH_UID);
       await routerGater.updateGoldfinchUIDAddress(GOLDFINCH_UID);
       expect(await routerGater.goldfinchUIDAddress()).to.equalIgnoreCase(GOLDFINCH_UID);
     });
@@ -68,7 +67,7 @@ describe("routerGater", function () {
 
     it("Should update the quadrata uid contract address", async function () {
       const { routerGater } = await getContractsFixture();
-      expect(await routerGater.quadrataAddress()).to.equalIgnoreCase(QUADRATA_UID_TESTNET);
+      expect(await routerGater.quadrataAddress()).to.equalIgnoreCase(QUADRATA_UID);
       await routerGater.updateQuadrataAddress(QUADRATA_UID);
       expect(await routerGater.quadrataAddress()).to.equalIgnoreCase(QUADRATA_UID);
     });

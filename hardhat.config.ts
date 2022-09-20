@@ -5,7 +5,8 @@ import { HardhatUserConfig } from "hardhat/config";
 import "solidity-coverage";
 import "hardhat-gas-reporter";
 
-dotenv.config();
+// Determine which Env should be used: .env.testnet -> for goerli deployment, .env.mainnet -> for mainnet deployment
+dotenv.config({ path: '.env.testnet' })
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -30,6 +31,10 @@ const config: HardhatUserConfig = {
       forking: {
         url: `https://goerli.infura.io/v3/${process.env.INFURA_KEY}`,
       },
+    },
+    mainnet: {
+      url: `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`,
+      accounts: [process.env.PRIVATE_KEY!],
     },
     goerli: {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_KEY}`,

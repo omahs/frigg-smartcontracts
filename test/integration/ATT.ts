@@ -1,7 +1,9 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { GOLDFINCH_UID_TESTNET, QUADRATA_UID_TESTNET } from "./constants";
+
+const GOLDFINCH_UID = process.env.GOLDFINCH_UID!;
+const QUADRATA_UID = process.env.QUADRATA_UID!;
 
 // Integration Tests for ATT.sol
 describe("ATT", function () {
@@ -18,7 +20,7 @@ describe("ATT", function () {
     const PRIMARY_ROUTER = await ethers.getContractFactory("primaryRouter");
     const ROUTER_GATER = await ethers.getContractFactory("routerGater");
 
-    const routerGater = await ROUTER_GATER.deploy(MULTISIG, GOLDFINCH_UID_TESTNET, QUADRATA_UID_TESTNET);
+    const routerGater = await ROUTER_GATER.deploy(MULTISIG, GOLDFINCH_UID, QUADRATA_UID);
     const primaryRouter = await PRIMARY_ROUTER.deploy(MULTISIG, routerGater.address);
     const att = await ATT.deploy(MULTISIG, owner.address);
     return { att, primaryRouter, owner, addr1 };

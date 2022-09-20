@@ -1,5 +1,4 @@
 import { ethers } from "hardhat";
-import { GOLDFINCH_UID_TESTNET, QUADRATA_UID_TESTNET, USDC_ADDRESS_TESTNET } from "../test/integration/constants";
 
 async function main() {
   const routerGaterContract = await ethers.getContractFactory("routerGater");
@@ -8,8 +7,11 @@ async function main() {
 
   const ROUTER_MULTISIG = process.env.ROUTER_MULTISIG;
   const TOKEN_MULTISIG = process.env.TOKEN_MULTISIG;
+  const GOLDFINCH_UID = process.env.GOLDFINCH_UID
+  const QUADRATA_UID = process.env.QUADRATA_UID
+  const USDC_ADDRESS = process.env.USDC_ADDRESS
 
-  const routerGater = await routerGaterContract.deploy(ROUTER_MULTISIG, GOLDFINCH_UID_TESTNET, QUADRATA_UID_TESTNET);
+  const routerGater = await routerGaterContract.deploy(ROUTER_MULTISIG, GOLDFINCH_UID, QUADRATA_UID);
   const primaryRouter = await primaryRouterContract.deploy(ROUTER_MULTISIG, routerGater.address);
   const att = await attContract.deploy(TOKEN_MULTISIG!, primaryRouter.address);
 
@@ -19,15 +21,15 @@ async function main() {
     issuer: TOKEN_MULTISIG,
     issuancePrice: 1000000000000,
     expiryPrice: 666666666666,
-    issuanceTokenAddress: USDC_ADDRESS_TESTNET,
+    issuanceTokenAddress: USDC_ADDRESS,
   };
 
   await primaryRouter.deployed();
   await att.deployed();
 
-  console.log(`Router Gater deployed: https://goerli.etherscan.io/address/${routerGater.address}`);
-  console.log(`Primary Router deployed: https://goerli.etherscan.io/address/${primaryRouter.address}`);
-  console.log(`ATT Token deployed: https://goerli.etherscan.io/address/${att.address}`);
+  console.log(`Router Gater deployed: ${process.env.ETHERSCAN_URL}address/${routerGater.address}`);
+  console.log(`Primary Router deployed: ${process.env.ETHERSCAN_URL}address/${primaryRouter.address}`);
+  console.log(`ATT Token deployed: ${process.env.ETHERSCAN_URL}address/${att.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
