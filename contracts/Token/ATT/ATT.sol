@@ -21,8 +21,8 @@ contract ATT is ERC20Capped, AccessControl, IFrigg {
     /// @dev The default value is true
     bool public primaryMarketActive = true;
 
-    /// @notice cap the supply of token to 20,000
-    constructor(address _multisig, address _router) ERC20("Agatobwe", "ATT") ERC20Capped(20000 * (10**18)) {
+    /// @notice cap the supply of token to 30,000
+    constructor(address _multisig, address _router) ERC20("Agatobwe", "ATT") ERC20Capped(30000 * (10**18)) {
         /// Set DEFAULT_ADMIN_ROLE to a multisig address controlled by Frigg
         /// DEFAULT_ADMIN_ROLE is already implemented in AccessControl contract
         _grantRole(DEFAULT_ADMIN_ROLE, _multisig);

@@ -28,7 +28,7 @@ Audited by Axelra Labs. Report available here (https://friggeco-my.sharepoint.co
 | ----------------- | :----------------------------------------: | -----------------------------------------: |
 | routerGater.sol   | 0xBCc3dB2316d8793f84c822953B622Bd292424C68 | 0x64a75f145e859Af7399f188Cf674afd7416D2b46 |
 | primaryRouter.sol | 0x96418DF8B474e90E49183CC23fa41e4aD8B0ddbE | 0x549eC5e96B71cBE1a837D0F1289462757e1d83E9 |
-| ATT.sol           |                                            |                                            |
+| ATT.sol           | 0x90D53b872ce6421122B41a290aCdD22a5eD931bd | 0x25a1dAd9d882c335D100f8E0cb20701376Eeb658 |
 
 ---
 
