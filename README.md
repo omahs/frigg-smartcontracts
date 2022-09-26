@@ -4,17 +4,17 @@ This documentation is meant to be private
 
 ## Audits
 
-Audited by Axelra Labs. Report available here (https://friggeco-my.sharepoint.com/:b:/g/personal/philip_berntsen_frigg_eco/Eagz5LGhOsFPrF7VlTujf1oBmhB6YAnOq30tpLKa3RJsAw?e=82q4gL)
+Audited by AxLabs GmbH & Axelra AG. Report available under ```/audit```
 
 ---
 
 ## Router Contract (primaryRouter.sol)
 
-- Implemented for primary market buy/sell between Issuers and Investors
+- For primary market buy/sell between Issuers and Investors
 
 ## Router Gater Contract (routerGater.sol)
 
-- Implemented as "Guard" Contract to check if the user is eligible to trade
+- "Guard" the Router contract to check if the users is eligible to buy/sell at primary market
 
 ## Token Contract (e.g ATT.sol)
 
