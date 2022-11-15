@@ -36,7 +36,7 @@ Audited by AxLabs GmbH & Axelra AG. Report available under ```/audit```
 
 Logic is available on Microsoft Whiteboard here (https://friggeco-my.sharepoint.com/:wb:/g/personal/jack_chong_frigg_eco/EXK9aFawTcVDmgGW3uFAJwUBGNE7OXfZDIkfbzSOFHMgAg?e=g8p9UL)
 
-![Screenshot 2022-09-16 at 2 08 34 PM](https://user-images.githubusercontent.com/62898158/190704331-e08603ae-6a42-4c25-9773-289a3e737c7b.png)
+![image](https://user-images.githubusercontent.com/67257968/201916977-c25357e4-6625-42eb-9a1f-f228510df6a7.png)
 
 ---
 
