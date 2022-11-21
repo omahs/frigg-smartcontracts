@@ -1,0 +1,48 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Create new bond (mainnet)
+
+on:
+  workflow_dispatch:
+
+  repository_dispatch:
+    types:
+      - webhook_mainnet
+
+env:
+    INFURA_KEY: ${{ secrets.INFURA_KEY }}
+    PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+    ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+    ETHERSCAN_URL: ${{ secrets.ETHERSCAN_URL }}
+    ROUTER_MULTISIG: ${{ secrets.ROUTER_MULTISIG }}
+    TOKEN_MULTISIG: ${{ secrets.TOKEN_MULTISIG }}
+    USDC_ADDRESS: ${{ secrets.USDC_ADDRESS }}
+    GOLDFINCH_UID: ${{ secrets.GOLDFINCH_UID }}
+    QUADRATA_UID: ${{ secrets.QUADRATA_UID }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment:
+      name: mainnet
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 'Run'
+        run: |
+          npm install
+          npx hardhat test
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: mainnet
+    needs: test
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 'Run'
+        run: |
+          npm install
+          npx hardhat run scripts/deploy.ts --network mainnet
