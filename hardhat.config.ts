@@ -29,15 +29,15 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       forking: {
-        url: `https://goerli.infura.io/v3/${process.env.INFURA_KEY}`,
+        url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
       },
     },
     mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`,
+      url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
       accounts: [process.env.PRIVATE_KEY!],
     },
     goerli: {
-      url: `https://goerli.infura.io/v3/${process.env.INFURA_KEY}`,
+      url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
       accounts: [process.env.PRIVATE_KEY!],
     },
   },
