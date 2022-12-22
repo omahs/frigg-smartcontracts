@@ -34,13 +34,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: "Test"
+      - name: "Show info"
         shell: pwsh
-        run: >
+        run: |
+          Write-Host "Id: ${{ env.ID }}"
+          Write-Host "RouterAddress: ${{ env.ROUTER_ADDRESS }}"
           Write-Host "Name: ${{ env.NAME }}"
+          Write-Host "Symbol: ${{ env.SYMBOL }}"
+          Write-Host "Amount: ${{ env.AMOUNT }}"
+          Write-Host "Terms: ${{ env.TERMS }}"
 
       - name: "Run"
-        if: ${{ false }}
         run: |
           npm install
           npx hardhat run scripts/deploy-token.ts --network goerli
