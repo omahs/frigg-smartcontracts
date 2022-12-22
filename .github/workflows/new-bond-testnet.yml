@@ -15,39 +15,32 @@ on:
       - webhook_testnet
 
 env:
-    ALCHEMY_KEY: ${{ secrets.ALCHEMY_KEY }}
-    INFURA_KEY: ${{ secrets.INFURA_KEY }}
-    PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-    ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
-    ETHERSCAN_URL: ${{ secrets.ETHERSCAN_URL }}
-    ROUTER_MULTISIG: ${{ secrets.ROUTER_MULTISIG }}
-    TOKEN_MULTISIG: ${{ secrets.TOKEN_MULTISIG }}
-    USDC_ADDRESS: ${{ secrets.USDC_ADDRESS }}
-    GOLDFINCH_UID: ${{ secrets.GOLDFINCH_UID }}
-    QUADRATA_UID: ${{ secrets.QUADRATA_UID }}
+  ALCHEMY_KEY: ${{ secrets.ALCHEMY_KEY }}
+  PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+  ETHERSCAN_URL: ${{ secrets.ETHERSCAN_URL }}
+  TOKEN_MULTISIG: ${{ secrets.TOKEN_MULTISIG }}
+  ID: ${{ github.event.client_payload.id }}
+  ROUTER_ADDRESS: ${{ github.event.client_payload.routerAddress }}
+  NAME: ${{ github.event.client_payload.name }}
+  SYMBOL: ${{ github.event.client_payload.symbol }}
+  AMOUNT: ${{ github.event.client_payload.amount }}
+  TERMS: ${{ github.event.client_payload.terms }}
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    environment:
-      name: testnet
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: 'Run'
-        run: |
-          npm install
-          npx hardhat test
-
   deploy:
     runs-on: ubuntu-latest
     environment:
       name: testnet
-    needs: test
     steps:
       - uses: actions/checkout@v3
 
-      - name: 'Run'
+      - name: "Test"
+        shell: pwsh
+        run: >
+          Write-Host "Name: ${{ env.NAME }}"
+
+      - name: "Run"
+        if: ${{ false }}
         run: |
           npm install
-          npx hardhat run scripts/deploy.ts --network goerli
+          npx hardhat run scripts/deploy-token.ts --network goerli
