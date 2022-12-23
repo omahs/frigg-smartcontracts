@@ -23,7 +23,7 @@ contract FriggToken is ERC20Capped, AccessControl, IFrigg {
 
     string private termsUrl;
 
-    /// @notice cap the supply of token to 30,000
+    /// @notice Pass the dynamic set params of the bond
     constructor(
         address _multisig,
         address _router,
@@ -39,6 +39,7 @@ contract FriggToken is ERC20Capped, AccessControl, IFrigg {
         /// Set MINTER_ROLE to router
         _grantRole(ROUTER_ROLE, _router);
 
+        /// Set the termsUrl to the passed value
         termsUrl = _termsUrl;
     }
 
