@@ -48,6 +48,8 @@ async function main() {
   console.log(`Frigg Token deployed: ${process.env.ETHERSCAN_URL}address/${friggToken.address}`);
 
   await updateDbRecord(ID, friggToken.address);
+
+  console.log(`Contract address added into CMS: ${friggToken.address}`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
