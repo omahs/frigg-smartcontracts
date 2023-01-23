@@ -7,7 +7,7 @@ async function updateDbRecord(id: string, contractAddress: string) {
   try {
     await client.connect();
 
-    await client.db("test").collection("bonds").updateOne(
+    await client.db("cms").collection("bonds").updateOne(
       { _id: new ObjectId(id) },
       {
         $set:
