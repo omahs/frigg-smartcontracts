@@ -8,7 +8,7 @@ The ATTs will be available for subscription on the Issuers Microsite. Each Bond 
 The Issuer offers to repurchase Bonds each year on the secondary market (Uniswap) for a total target purchase price of at least 4% of the outstanding nominal amount of the tokens until the end of the Term.
 
 ## Maturity and buy-back
-Once the bond reach the end of the Term, the issuer will repurchase each Token Bond at a fixed price of USD 182 less applicable witholding tax of the domicile contry of the issuer. 
+Once the bond reaches the end of the Term, the issuer will repurchase each Token Bond at a fixed price of USD 182 less applicable withholding tax of the domicile country of the issuer. 
 
 
 ## Facts & Figures
